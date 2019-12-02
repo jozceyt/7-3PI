@@ -1,4 +1,5 @@
-Prueba version 
+Semaforos prueba y error 
+
 .model small
 .data
 .code
