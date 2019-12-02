@@ -1,0 +1,99 @@
+.model small
+.data
+.code
+ ;Procedimientos   
+ siguiente_estado proc 
+    
+    ;Leer estado del semaforo
+    in ax,4
+    
+    ;Validar estado del semaforo
+    ;Vertical (verde), Transv (rojo)
+    cmp ax,0000001100001100b
+    je estado_va_tr      
+    
+    ;Vertical (amarillo), Transv (rojo)
+    cmp ax,0000001010001010b
+    je estado_vr_tv          
+    
+    ;Vertical (rojo), Transv (verde)
+    cmp ax,0000100001100001b
+    je estado_vr_ta
+    
+    ;Vertical (rojo), Transv (amarillo)
+    cmp ax,0000010001010001b
+    je estado_vv_tr                
+    
+    default:
+         mov ax,0000001100001100b
+         out 4,ax
+         jmp salida
+    
+    estado_va_tr:  
+                ;Vertical (amarillo), Transv (rojo)
+                mov ax,0000001010001010b   
+                out 4,ax 
+                jmp salida ;break
+    estado_vr_tv:                
+                ;Vertical (rojo), Transv (verde)
+                mov ax,0000100001100001b
+                out 4,ax
+                jmp salida ;break
+    estado_vr_ta:
+                ;Vertical (rojo), Transv (amarillo)
+                mov ax,0000010001010001b
+                out 4,ax
+                jmp salida ;break
+    estado_vv_tr:
+                ;Vertical (verd), Transv(rojo)
+                mov ax,0000001100001100b                
+                out 4,ax
+                jmp salida ;break
+    
+    salida:
+           ret 
+ siguiente_estado endp 
+ 
+ retraso_1 proc
+    mov ah,86h
+    mov cx,0fh
+    int 15h
+    ret
+ retraso_1 endp 
+ 
+ intermitencia proc
+      mov ax,0000001010001010b
+      out 4,ax
+      
+      mov cx,07h
+      mov ah,86h
+      int 15h
+      
+      mov ax,000000000000000b
+      out 4,ax
+      
+      mov cx,07h
+      mov ah,86h
+      int 15h
+      
+      ret
+ intermitencia endp
+ 
+ programa:  
+ 
+    ;Reset al semaforo
+    mov ax,1111111111111111b
+    out 4,ax
+
+    ;estados: 
+    ;    call siguiente_estado 
+    ;    call retraso_1
+    ;jmp estados
+
+    intermitencias:   
+         call intermitencia
+    jmp intermitencias
+    
+ end programa
+ 
+ 
